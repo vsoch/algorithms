@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
-# Vanessa Sochat
-# April 2018
+# Copyright (c) 2018, Vanessa Sochat
+# All rights reserved.
 #
 # Given N activities with their start and finish times. Select the maximum 
 # number of activities that can be performed by a single person, assuming 
 # that a person can only work on a single activity at a time.
 #
+# See LICENSE in the repository root
+
 
 import sys
 import robotnamer
@@ -124,6 +126,7 @@ def interval_schedule(activities):
 
     # Sort by start time again
     return sorted(chosen, key=lambda act: act.start)
+
 
 # Decorators and helpers for printing
 
