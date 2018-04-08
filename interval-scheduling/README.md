@@ -11,8 +11,8 @@
 
 ```
 # Random selection of N
-docker run vanessa/interview-scheduling
+docker run vanessa/algorithms:interview-scheduling
 
 # Choose N to be 15 for 15 contender events
-docker run vanessa/interview-scheduling 15
+docker run vanessa/algorithms:interview-scheduling 15
 ```
