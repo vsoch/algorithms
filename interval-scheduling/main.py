@@ -105,12 +105,12 @@ def interval_schedule(activities):
     chosen = []
     step = 0
 
+    # Sort activities so by soonest ending
+    activities = sorted(activities, key=lambda act: act.end)    
+
     while len(activities) > 0:
 
         step+=1
-
-        # Sort activities so by soonest ending
-        activities = sorted(activities, key=lambda act: act.end)    
         
         # Choose the earliest end time, tell the user
         activity = activities.pop(0)
@@ -119,8 +119,17 @@ def interval_schedule(activities):
         # Add activity to start always, since earlier are added later
         chosen.append(activity)
         
-        # Remove other activities with start times earlier than the start
-        activities = [a for a in activities if a.start >= activity.end]
+        # Keep track of some removed metrics for the user
+        keep_removing = True
+
+        # Remove (pop) other activities with start times earlier than the start
+        while keep_removing and len(activities) > 0:
+            next = activities[0]
+            if next.start < activity.end:
+                _ = activities.pop()
+            else:
+                keep_removing = False
+
 
     print('Total steps taken: %s' %step)
 
