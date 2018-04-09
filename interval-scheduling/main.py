@@ -133,8 +133,8 @@ def interval_schedule(activities):
 
     print('Total steps taken: %s' %step)
 
-    # Sort by start time again
-    return sorted(chosen, key=lambda act: act.start)
+    # Return... the chosen ones!
+    return chosen
 
 
 # Decorators and helpers for printing
