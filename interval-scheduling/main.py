@@ -126,7 +126,7 @@ def interval_schedule(activities):
         while keep_removing and len(activities) > 0:
             next = activities[0]
             if next.start < activity.end:
-                _ = activities.pop()
+                _ = activities.pop(0)
             else:
                 keep_removing = False
 
