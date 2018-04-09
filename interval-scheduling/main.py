@@ -124,8 +124,8 @@ def interval_schedule(activities):
 
         # Remove (pop) other activities with start times earlier than the start
         while keep_removing and len(activities) > 0:
-            next = activities[0]
-            if next.start < activity.end:
+            next_activity = activities[0]
+            if next_activity.start < activity.end:
                 _ = activities.pop(0)
             else:
                 keep_removing = False
