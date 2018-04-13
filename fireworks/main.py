@@ -20,6 +20,7 @@
 
 import random
 import argparse
+import itertools
 import asyncio
 import string
 import math
@@ -34,14 +35,18 @@ import sys
 
 class Firework(object):
 
-    def __init__(self, start, end, loop=None):
+    def __init__(self, end, start=0, size=None, thresh=None):
         '''a Firework object holds the start and end time for firing a firework,
-           along with functions to fire them!
+           along with functions to fire them! We only need the duration to
+           estimate a range of trigger (firing times) for the firework.
+           Other implementations might have other uses for start and end times. 
 
            Parameters
            ==========
            start: the starting time of the interval to select from        
            end: the ending time of the interval to select from        
+           size: the maximum width of the firework
+           thresh: a parameter to control threshold for fill, determines design!
 
         '''
         self.start = start                            # time zero
@@ -52,14 +57,21 @@ class Firework(object):
 
         self.color1 = self.choose_color()
         self.color2 = self.choose_color()
+        self.bgcolor = self.choose_color()
 
         # Firework characters
 
         self.char1 = random.choice(',.*^`\'"')
         self.char2 = self.choose_character()
+        self.bgchar = self.choose_character()
 
-        self.offset = random.randint(0, 80)
-        self.size = random.choice(range(7, 19, 2))
+        self.offset = random.randint(0, 40)
+        self.thresh = thresh or random.choice(range(1,50))
+
+        self.inner = random.choice( range( 10, 15 ))
+        self.outer = self.inner + random.choice(range(1,10))
+        self.size = size or random.choice(range(7, self.inner, 2))
+
 
     def __repr__(self):
         return self.__str__()
@@ -74,9 +86,10 @@ class Firework(object):
         show = self.ready()
         for design in show:
             print(design)
+            time.sleep(0.3)
+            print('\033c')
 
-
-    def _get_number_boums(self):
+    def count_designs(self):
         '''get the number of designs anticipated for the firework, depending
            on its size
         '''
@@ -94,6 +107,7 @@ class Firework(object):
         return "Firework (%05d:%05d)" % (self.start,
                                          self.end)
 
+
     def choose_character(self):
         '''choose a random character to be the predominant (larger of the two
            designs).
@@ -102,17 +116,26 @@ class Firework(object):
                              string.digits + 
                              '!@#$%^*&( )_+}{')
 
-    def choose_shape(self, char='O', n1=15, n2=15, inner=5, outer=15):
+
+    def generate_shape(self, char='O', n1=15, n2=15, 
+                             inner=5, outer=15, matrix=False):
+
         '''generate a firework design based on inner and outer lengths,
            and variables n1 and n2 to control the angles.
 
            Parameters
            ==========
            outer: a multiplier for the outer radius. 
-           inner: a set inner radius "cutoff" to determine printing the char
+           inner: the same for the inner radius. The outer-inner is the 
+                  section that we are going to fill in (based on a zigzag)
+           char: the character to fill in when appropriate
+           n1,n1: factors to scale zigzag. When n1==n2 we get circle pattern
+           matrix: if True, return list of lists instead of string
 
         '''
         design = ''
+        if matrix is True:
+            design = []
 
         # This is the (inside portion) of the outer circle (diameter)
         # [-----][-----]
@@ -121,6 +144,7 @@ class Firework(object):
 
             # This is the (outer portion) of the same circle (diameter)
             # [-----][-----][-----][-----]
+            row = []
 
             for j in range(outer*4):
 
@@ -154,23 +178,77 @@ class Firework(object):
                 #   If actual radius is < cutoff radius --> fill in
                 #   otherwise put a blank space.
                 if radius < cutoff:
-                    design += char
+                    row.append(char)
                 else:
-                    design += ' '
+                    row.append(' ')
 
-                # - At the end of a row, add a newline
-            design += '\n'
+            # - At the end of a row, add a newline
+            row.append('\n')
+
+            # If we have a matrix, append the row. Otherwise add to design str
+            if matrix is True:
+                design.append(row)
+            else:
+                design+= ''.join(row)
 
         return design
 
 
+    def generate_center(self, char1, char2, size, offset, matrix=False):
+        ''' The core of the firework is the glowing orb where the explosion
+            happens! It just needs to be circular and fluctuate between
+            two colors. The core will consist of two design characters, 
+            alternating in rows increasing in size to form something that 
+            looks circular up to a max width, and from some offset from the left.
 
-    def generate_design(self, char1=None, char2=None, 
-                              color1=None, color2=None,
-                              offset=None, size=None):
+            Parameters
+            ==========
+            matrix: if True, return each value in a cell (versus string)
+ 
+              ^,^,^
+            ^,^,^,^,^
+            ^,^,^,^,^
+              ^,^,^
+
+            Returns
+            =======
+            design: list of lists (matrix) if matrix is True, otherwise string
+
+        '''
+
+        design = ''
+
+        # If returning a matrix, we will return a list of lists
+        if matrix is True:
+            design = []
+
+        # Slightly different ranges determine top and bottom of shape
+        top_range = range(2, size, 2)
+        bot_range = range(size, 2, -2)
+        ranges = itertools.chain(top_range, bot_range)
+
+        for i in ranges:
+            if i == size: i = size - 1
+            padding = [" "]*(size-i + offset)
+            row = padding + i*["%s%s" %(char1,char2)]
+
+            # Matrix return appends a row
+            if matrix is True:
+                design.append(row)
+
+            # Otherwise extend the string
+            else:
+                design += '\n' + ''.join(row)
+
+        return design
+
+
+    def generate_design(self, offset=None, size=None, thresh=None):
         '''a firework will consist of two design characters, alternating in rows
            increasing in size to form something that looks circular up to a max
-           width, and from some offset from the left.
+           width, and from some offset from the left. Thresh is a parameter to
+           determine cutoff threshold for filling along zig zag, and drives
+           design.
 
             ^,^,^
           ^,^,^,^,^
@@ -178,45 +256,89 @@ class Firework(object):
             ^,^,^
 
         '''
-        # The character pattern, size, and offset for the firework 
-        char1 = char1 or self.char1
-        char2 = char2 or self.char2
-        color1 = color1 or self.color1
-        color2 = color2 or self.color2
 
         # Width and offset from the left
         size = size or self.size
         offset = offset or self.offset
 
-        char1 = '%s%s\033[0m' %(color1, char1)
-        char2 = '%s%s\033[0m' %(color2, char2)
+        char1 = '%s%s\033[0m' %(self.color1, self.char1)
+        char2 = '%s%s\033[0m' %(self.color2, self.char2)
+        bgchar = '%s%s\033[0m' %(self.bgcolor, self.bgchar)
 
-        # Step 4: generate the firework design
-        # Here we take two steps:
+        thresh = thresh or self.thresh
+       
+        # Step 4: generate the firework design, use matrix generation
+        #   so we can combine later. This means two steps:
 
-        # 1. Create a background circle
+        #   1. Create a background design (one color)
+        #   2. overlay center "boum" on background! (two colors)
+  
+        # 1. Generate primary background (shape)
 
-        design = ''
+        background = self.generate_shape(char=bgchar,
+                                         outer=self.outer,
+                                         inner=self.inner,
+                                         n1=thresh, 
+                                         n2=thresh,
+                                         matrix=True)
 
-        # Top half of firework 
+        # The shape, X by Y is (offset x 2) by ()
+        # 2. Create center "boum" region
 
-        for i in range(2, size, 2):
-            if i == size: i = size - 1
-            padding = " "*(size-i + offset)
-            design += '\n' + padding + i*("%s%s" %(char1,char2))
+        center = self.generate_center(size=size,
+                                      char1=char1,
+                                      char2=char2,
+                                      offset=0,     # Offset added later
+                                      matrix=True)
 
-        # Bottom half
+        # 3. Combine!
 
-        for i in range(size, 2, -2):
-            if i == size: i = size - 1
-            padding = " "*(size-i + offset)
-            design += '\n' + padding + i*("%s%s" %(char1,char2))
-
-        # and 2: overlay with design
+        design = self.merge_designs(background, center, offset)
 
         return design
 
  
+    def merge_designs(self, background, center, offset=None):
+        '''a rough algorithm for merging the center with the background.
+           We estimate the center row and column of the background, and do
+           a (rounded) transformation of the center to that point.
+        '''
+
+        design = ''
+    
+        # background is a list of rows
+        #   so its length is # rows
+        # background[0] is a list that turns into a row
+        #   so its length is the number of columns
+        
+        # Difference in number rows (background is always larger)
+
+        rowdiff = len(background) - len(center)
+        rowpad = int(rowdiff/2)
+
+        # The approx center column (half width of the background)
+
+        centercol = int(len(background[0])/2)
+        
+        # We need the center of the center design to be at centercol
+        # (padding) + 0.5*(center width) = centercol
+        
+        colpad = int( centercol - (len(center[0]) ))
+
+        # We will iterate through center coordinates
+
+        for col in range(len(center)):
+            for row in range(len(center[0])):
+
+                # The character is a character plus color with escape sequence
+                char = center[col][row]
+
+                # And add the character transformed to background space
+                if char != ' ':
+                    background[row+rowpad][col+colpad] = char
+
+        return ''.join([''.join(col) for col in background])
+
 
     def choose_color(self):
         '''choose a random color! We will add a background and make it bold.
@@ -297,7 +419,7 @@ async def schedule_firework(loop, fireworks, length):
     for firework in fireworks:
 
         # How many times does the firework need to fire?
-        count = firework._get_number_boums()
+        count = firework.count_designs()
 
         times = []
         for ii in range(count+1):
@@ -357,20 +479,22 @@ def get_parser():
     '''
     parser = argparse.ArgumentParser(description='Fireworks Generator!')
     parser.add_argument('--alpha', '-a', type=float, default=0.01, dest='alpha',
-                        help='''the size of the region (percentage of 
-                                difference between start and end) to sample''')
+                        help='size of region to sample to determine durations')
+    parser.add_argument('--boum', default=False, action="store_true",
+                        help='forget the show, generate and boum a firework!')
+    parser.add_argument('--size', '-s', type=int, default=None, dest='size',
+                        help='maximum size of firework (undefined for random)')
     parser.add_argument('--number', '-n', type=int, default=1000, dest='number',
                         help='number of fireworks for the show')
-    parser.add_argument('--start','-s', type=int, default=0, 
-                        help='start time', dest='start')
     parser.add_argument('--end', '-e', type=int, default=100, 
-                        help='end time', dest='end')
+                        help='limit for end time / duration', dest='end')
 
     return parser
 
 
-def get_firework_schedule(start_time=0, 
-                          end_time=1000,
+
+def get_firework_schedule(end_time=1000,
+                          start_time=0,
                           number=100,
                           alpha=0.1,
                           delta=0):
@@ -380,9 +504,9 @@ def get_firework_schedule(start_time=0,
 
        Parameters
        ==========
-       start_time: the starting time of the interval to uniformly select from        
-       end_time: the set ending time for all fireworks, fireworks will end in
-                 small range (alpha) of this time.
+       end_time: the set ending time for all fireworks from start_time, 
+                 fireworks will end in small range (alpha) of this time.
+       start_time: the start time of the show, reasonably is 0
        number: the number of fireworks to deploy
        delta: the minimum change between start and end time before stopping
        alpha: the size of the region (percentage of difference between
@@ -436,16 +560,21 @@ def main():
         parser.print_help()
         sys.exit(1)
 
+    # Just generate one firework and exit
+
+    if args.boum is True:
+        firework = Firework(end=args.end, size=args.size)
+        firework.boum()
+        sys.exit(0)
+
     section('Generating fireworks schedule!...\n')
-    schedule = get_firework_schedule(start_time=args.start,
-                                     end_time=args.end,
+    schedule = get_firework_schedule(end_time=args.end,
                                      number=args.number,
                                      alpha=args.alpha)
 
     print('The schedule has %s fireworks!' %len(schedule))
-    print('[start time]: %s' %args.start)
-    print('  [end time]: %s' %args.end)
-    print('     [alpha]: %s' %args.alpha)
+    print('  [max-duration]: %s' %args.end)
+    print('         [alpha]: %s' %args.alpha)
 
     fireworks_show(schedule, args.end)
 
