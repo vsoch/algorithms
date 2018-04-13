@@ -35,7 +35,7 @@ import sys
 
 class Firework(object):
 
-    def __init__(self, end, start=0, size=None, thresh=None, simple=None):
+    def __init__(self, end, start=0, size=None, simple=None):
         '''a Firework object holds the start and end time for firing a firework,
            along with functions to fire them! We only need the duration to
            estimate a range of trigger (firing times) for the firework.
@@ -46,7 +46,6 @@ class Firework(object):
            start: the starting time of the interval to select from        
            end: the ending time of the interval to select from        
            size: the maximum width of the firework
-           thresh: a parameter to control threshold for fill, determines design!
            simple: generate a simple vs. complicated design
 
         '''
@@ -60,19 +59,23 @@ class Firework(object):
         self.color2 = self.choose_color()
         self.bgcolor = self.choose_color()
 
-        # Firework characters
+        # Characters
 
         self.char1 = random.choice(',.*^`\'"')
         self.char2 = self.choose_character()
         self.bgchar = self.choose_character()
 
+        # Sizing
+
         self.offset = random.randint(0, 40)
-        self.thresh = thresh or random.choice(range(1,50))
+        self.inner = random.choice( range( 0, 15 ))
+        self.size = size or random.choice(range(7, 21, 2))
+
+        # Design Complexity
+
+        self.thresh = random.choice(range(1,50))
         self.simple = simple or random.choice([True, False])
 
-        self.inner = random.choice( range( 10, 15 ))
-        self.outer = self.inner + random.choice(range(1,10))
-        self.size = size or random.choice(range(7, self.inner, 2))
 
 
     def __repr__(self):
@@ -88,7 +91,7 @@ class Firework(object):
         show = self.ready()
         for design in show:
             print(design)
-            time.sleep(0.3)
+            time.sleep(0.5)
             if clear:
                 print('\033c')
 
@@ -246,7 +249,7 @@ class Firework(object):
         return design
 
 
-    def generate_design(self, offset=None, size=None, thresh=None, simple=None):
+    def generate_design(self, offset=None, size=None, simple=None):
         '''a firework will consist of two design characters, alternating in rows
            increasing in size to form something that looks circular up to a max
            width, and from some offset from the left. Thresh is a parameter to
@@ -267,8 +270,6 @@ class Firework(object):
         char1 = '%s%s\033[0m' %(self.color1, self.char1)
         char2 = '%s%s\033[0m' %(self.color2, self.char2)
         bgchar = '%s%s\033[0m' %(self.bgcolor, self.bgchar)
-
-        thresh = thresh or self.thresh
        
         # Step 4: generate the firework design
         simple = simple or self.simple
@@ -292,10 +293,10 @@ class Firework(object):
 
         else:
             design = self.generate_shape(char=bgchar,
-                                         outer=self.outer,
+                                         outer=size,
                                          inner=self.inner,
-                                         n1=thresh, 
-                                         n2=thresh)
+                                         n1=self.thresh, 
+                                         n2=self.thresh)
 
             # The shape, X by Y is (offset x 2) by ()
             # 2. Create center "boum" region
@@ -453,7 +454,7 @@ async def schedule_firework(loop, fireworks, length):
                     oggle = generate_oggle()
                     print(oggle)
 
-                print(design, end='\r')
+                print(design)
 
             # Each design will be scheduled for later
             trigger = times.pop(0)
