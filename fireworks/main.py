@@ -125,8 +125,13 @@ class Firework(object):
         '''prepare the show! This is an interator to reveal slowly increasing
            in size fireworks. boum!
         '''
-        for size in range(self.count_designs()):
-            yield self.generate_design(size=size)
+        number = self.count_designs()
+        delta = self.size / number
+        inner = self.inner + delta
+
+        for size in range(number):
+            inner = self.inner - delta
+            yield self.generate_design(size=size, inner=inner)
 
     def __str__(self):
         return "Firework (%05d:%05d)" % (self.start,
@@ -272,7 +277,7 @@ class Firework(object):
         return design
 
 
-    def generate_design(self, offset=None, size=None, simple=None):
+    def generate_design(self, offset=None, size=None, simple=None, inner=None):
         '''a firework will consist of two design characters, alternating in rows
            increasing in size to form something that looks circular up to a max
            width, and from some offset from the left. Thresh is a parameter to
@@ -296,6 +301,7 @@ class Firework(object):
        
         # Step 4: generate the firework design
         simple = simple or self.simple
+        inner = inner or self.inner
 
         # Case 1: the user just wants a simple design.
         if simple:
@@ -310,7 +316,7 @@ class Firework(object):
         else:
             design = self.generate_shape(char=bgchar,
                                          outer=size,
-                                         inner=self.inner,
+                                         inner=inner,
                                          n1=self.thresh, 
                                          n2=self.thresh,
                                          offset=offset)
