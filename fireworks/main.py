@@ -82,14 +82,15 @@ class Firework(object):
         print("Baby I'm a %s!" %str(self))
 
 
-    def boum(self):
+    def boum(self, clear=True):
         '''a firework "boum" will print all stages of the firework!
         '''
         show = self.ready()
         for design in show:
             print(design)
             time.sleep(0.3)
-            print('\033c')
+            if clear:
+                print('\033c')
 
     def count_designs(self):
         '''get the number of designs anticipated for the firework, depending
@@ -549,7 +550,7 @@ def get_firework_schedule(end_time=1000,
         end = random.randint(end_time-change, end_time)
 
         # Otherwise, add to list and keep going!
-        firework = Firework(start,end)
+        firework = Firework(start, end)
         schedule.append(firework)
 
         start_time=firework.start
