@@ -291,11 +291,11 @@ def get_parser():
     parser.add_argument('--alpha', '-a', type=float, default=0.01, dest='alpha',
                         help='''the size of the region (percentage of 
                                 difference between start and end) to sample''')
-    parser.add_argument('--number', '-n', type=int, default=100, dest='number',
+    parser.add_argument('--number', '-n', type=int, default=1000, dest='number',
                         help='number of fireworks for the show')
     parser.add_argument('--start','-s', type=int, default=0, 
                         help='start time', dest='start')
-    parser.add_argument('--end', '-e', type=int, default=500, 
+    parser.add_argument('--end', '-e', type=int, default=100, 
                         help='end time', dest='end')
 
     return parser
