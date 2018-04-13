@@ -35,7 +35,7 @@ import sys
 
 class Firework(object):
 
-    def __init__(self, end, start=0, size=None, thresh=None):
+    def __init__(self, end, start=0, size=None, thresh=None, simple=None):
         '''a Firework object holds the start and end time for firing a firework,
            along with functions to fire them! We only need the duration to
            estimate a range of trigger (firing times) for the firework.
@@ -47,6 +47,7 @@ class Firework(object):
            end: the ending time of the interval to select from        
            size: the maximum width of the firework
            thresh: a parameter to control threshold for fill, determines design!
+           simple: generate a simple vs. complicated design
 
         '''
         self.start = start                            # time zero
@@ -67,6 +68,7 @@ class Firework(object):
 
         self.offset = random.randint(0, 40)
         self.thresh = thresh or random.choice(range(1,50))
+        self.simple = simple or random.choice([True, False])
 
         self.inner = random.choice( range( 10, 15 ))
         self.outer = self.inner + random.choice(range(1,10))
@@ -80,10 +82,10 @@ class Firework(object):
         print("Baby I'm a %s!" %str(self))
 
 
-    def boum(self, simple=False):
+    def boum(self):
         '''a firework "boum" will print all stages of the firework!
         '''
-        show = self.ready(simple=simple)
+        show = self.ready()
         for design in show:
             print(design)
             time.sleep(0.3)
@@ -96,12 +98,12 @@ class Firework(object):
         return len(range(7, self.size, 2))
 
 
-    def ready(self, simple=False):
+    def ready(self):
         '''prepare the show! This is an interator to reveal slowly increasing
            in size fireworks. boum!
         '''
         for size in range(5, self.size, 2):
-            yield self.generate_design(size=size, simple=simple)
+            yield self.generate_design(size=size)
 
     def __str__(self):
         return "Firework (%05d:%05d)" % (self.start,
@@ -243,7 +245,7 @@ class Firework(object):
         return design
 
 
-    def generate_design(self, offset=None, size=None, thresh=None, simple=False):
+    def generate_design(self, offset=None, size=None, thresh=None, simple=None):
         '''a firework will consist of two design characters, alternating in rows
            increasing in size to form something that looks circular up to a max
            width, and from some offset from the left. Thresh is a parameter to
@@ -268,6 +270,7 @@ class Firework(object):
         thresh = thresh or self.thresh
        
         # Step 4: generate the firework design
+        simple = simple or self.simple
 
         # Case 1: the user just wants a simple design.
         if simple:
@@ -287,24 +290,23 @@ class Firework(object):
         # 1. Generate primary background (shape)
 
         else:
-            background = self.generate_shape(char=bgchar,
-                                             outer=self.outer,
-                                             inner=self.inner,
-                                             n1=thresh, 
-                                             n2=thresh,
-                                             matrix=True)
+            design = self.generate_shape(char=bgchar,
+                                         outer=self.outer,
+                                         inner=self.inner,
+                                         n1=thresh, 
+                                         n2=thresh)
 
             # The shape, X by Y is (offset x 2) by ()
             # 2. Create center "boum" region
 
-            center = self.generate_center(size=size,
-                                          char1=char1,
-                                          char2=char2,
-                                          offset=0,     # Offset added later
-                                          matrix=True)
+            #center = self.generate_center(size=size,
+            #                              char1=char1,
+            #                              char2=char2,
+            #                              offset=0,     # Offset added later
+            #                              matrix=True)
 
             # 3. Combine!
-            design = self.merge_designs(background, center, offset)
+            #design = self.merge_designs(background, center, offset)
 
         return design
 
@@ -495,7 +497,7 @@ def get_parser():
                         help='forget the show, generate and boum a firework!')
     parser.add_argument('--size', '-s', type=int, default=None, dest='size',
                         help='maximum size of firework (undefined for random)')
-    parser.add_argument('--simple', default=False, action="store_true",
+    parser.add_argument('--simple', default=None, action="store_true",
                         help='just return a simple design.')
     parser.add_argument('--number', '-n', type=int, default=1000, dest='number',
                         help='number of fireworks for the show')
@@ -576,8 +578,8 @@ def main():
     # Just generate one firework and exit
 
     if args.boum is True:
-        firework = Firework(end=args.end, size=args.size)
-        firework.boum(simple=args.simple)
+        firework = Firework(end=args.end, size=args.size, simple=args.simple)
+        firework.boum()
         sys.exit(0)
 
     section('Generating fireworks schedule!...\n')
