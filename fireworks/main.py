@@ -21,7 +21,6 @@
 import random
 import argparse
 import itertools
-import asyncio
 import string
 import math
 import time
@@ -84,14 +83,34 @@ class Firework(object):
     def speak(self):
         print("Baby I'm a %s!" %str(self))
 
+    def oggle(self):
+        '''generate an audience expression, with some padding on the left.
+        '''
+        oggle = random.choice(['Ooooooh!', "Again!",
+                               'Ahhhhh!', "Beautiful!",
+                               'Boom!', 'Amazing!',
+                               "Baby you're a...", "Woohoo!",
+                               'Pow!', 'Wow!', "Damn!",
+                               'Sizzle...', 'Whoa!',
+                               'Spa!', 'Ha!'])
+
+        padding = " "*int(random.uniform(0,75))
+        print(padding + oggle)
+
 
     def boum(self, clear=True):
         '''a firework "boum" will print all stages of the firework!
         '''
         show = self.ready()
         for design in show:
+
+            # Every once in a while, print an oggle :)
+            if random.uniform(0,1) > 0.95:
+                self.oggle()
+                time.sleep(0.5)
+                
             print(design)
-            time.sleep(0.5)
+            time.sleep(0.1)
             if clear:
                 print('\033c')
 
@@ -99,14 +118,14 @@ class Firework(object):
         '''get the number of designs anticipated for the firework, depending
            on its size
         '''
-        return len(range(7, self.size, 2))
+        return len(range(0, self.size))
 
 
     def ready(self):
         '''prepare the show! This is an interator to reveal slowly increasing
            in size fireworks. boum!
         '''
-        for size in range(5, self.size, 2):
+        for size in range(self.count_designs()):
             yield self.generate_design(size=size)
 
     def __str__(self):
@@ -123,7 +142,7 @@ class Firework(object):
                              '!@#$%^*&( )_+}{')
 
 
-    def generate_shape(self, char='O', n1=15, n2=15, 
+    def generate_shape(self, char='O', n1=15, n2=15, offset=None,
                              inner=5, outer=15, matrix=False):
 
         '''generate a firework design based on inner and outer lengths,
@@ -190,6 +209,10 @@ class Firework(object):
 
             # - At the end of a row, add a newline
             row.append('\n')
+ 
+            # Did we want an offset?
+            if offset is not None:
+                row = [' ']*offset + row
 
             # If we have a matrix, append the row. Otherwise add to design str
             if matrix is True:
@@ -282,21 +305,23 @@ class Firework(object):
                                           offset=offset)
 
        
-        # Case 2: more complex
-        # use matrix generation
-        #   so we can combine later. This means two steps:
-
-        #   1. Create a background design (one color)
-        #   2. overlay center "boum" on background! (two colors)
+        # Case 2: complex design
   
-        # 1. Generate primary background (shape)
-
         else:
             design = self.generate_shape(char=bgchar,
                                          outer=size,
                                          inner=self.inner,
                                          n1=self.thresh, 
-                                         n2=self.thresh)
+                                         n2=self.thresh,
+                                         offset=offset)
+
+  
+        # Case 3:?
+        # use matrix generation
+        #   so we can combine later. This means two steps:
+
+        #   1. Create a background design (one color)
+        #   2. overlay center "boum" on background! (two colors)
 
             # The shape, X by Y is (offset x 2) by ()
             # 2. Create center "boum" region
@@ -393,94 +418,18 @@ def section(text):
     newline()
  
 
-
-def generate_oggle():
-    '''generate an audience expression, with some padding on the left.
-    '''
-    oggle = random.choice(['Ooooooh!', "Again!",
-                           'Ahhhhh!', "Beautiful!",
-                           'Boom!', 'Amazing!',
-                           "Baby you're a...", "Woohoo!",
-                           'Pow!', 'Wow!', "Damn!",
-                           'Sizzle...', 'Whoa!',
-                           'Spa!', 'Ha!'])
-    padding = " "*int(random.uniform(0,75))
-    return padding + oggle
-
-
-
-
-
-################################################################################
-# Asyncio Running Loop
-################################################################################
-
-
-async def schedule_firework(loop, fireworks, length):
-    '''run the fireworks schedule, going from the start at time 0 and stopping
-       the loop at length specified
-
-       Parameters
-       ==========
-       loop: the event loop
-       fireworks: the list of firework objects
-       length: the total length of the show (in seconds)
-
-    '''
-
-    # The start of the show
-    start_time = loop.time()
-
-    for firework in fireworks:
-
-        # How many times does the firework need to fire?
-        count = firework.count_designs()
-
-        times = []
-        for ii in range(count+1):
-            # Bias closer to the end of the duration
-            weight = math.pow(random.uniform(0,1),0.5)
-            times.append(firework.duration*weight)
-
-        # Generate designs for the show
-        show = firework.ready()
-        for design in show:
-
-            # Callback function to print the firework
-            def boum(design):
-
-                # Every once in a while, print an oggle :)
-                if random.uniform(0,1) > 0.95:
-                    oggle = generate_oggle()
-                    print(oggle)
-
-                print(design)
-
-            # Each design will be scheduled for later
-            trigger = times.pop(0)
-            loop.call_at(start_time + trigger, boum, design)
-
-    await asyncio.sleep(length)
-
         
 
-def fireworks_show(fireworks, length):
+def fireworks_show(fireworks):
     '''create the loop of tasks to start the fireworks show!
        
        Parameters
        ==========
        fireworks: the schedule of fireworks!
-       length: how long the show will endure (cut after this many seconds)
 
     '''
-    loop = asyncio.get_event_loop()
-    try:
-        print('Starting the show!')
-        loop.run_until_complete(schedule_firework(loop, fireworks, length))
-    finally:
-        print('Woohoo!')
-        loop.close()
-
+    for firework in fireworks:
+        firework.boum()
 
 
 ################################################################################
@@ -513,8 +462,7 @@ def get_parser():
 def get_firework_schedule(end_time=1000,
                           start_time=0,
                           number=100,
-                          alpha=0.1,
-                          delta=0):
+                          alpha=0.1):
 
     '''get a random interval time between start time and end time.
        Start time and end time should be in integer units.
@@ -525,7 +473,6 @@ def get_firework_schedule(end_time=1000,
                  fireworks will end in small range (alpha) of this time.
        start_time: the start time of the show, reasonably is 0
        number: the number of fireworks to deploy
-       delta: the minimum change between start and end time before stopping
        alpha: the size of the region (percentage of difference between
               start and end) to sample from for new start and end times.
 
@@ -589,11 +536,11 @@ def main():
                                      number=args.number,
                                      alpha=args.alpha)
 
-    print('The schedule has %s fireworks!' %len(schedule))
-    print('  [max-duration]: %s' %args.end)
-    print('         [alpha]: %s' %args.alpha)
+    print('The schedule is prepared!')
+    print('  [fireworks]: %s' %len(schedule))
+    print('      [alpha]: %s' %args.alpha)
 
-    fireworks_show(schedule, args.end)
+    fireworks_show(schedule)
 
 if __name__ == "__main__":
     main()
