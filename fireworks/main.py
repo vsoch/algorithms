@@ -102,6 +102,69 @@ class Firework(object):
                              string.digits + 
                              '!@#$%^*&( )_+}{')
 
+    def choose_shape(self, char='O', n1=15, n2=15, inner=5, outer=15):
+        '''generate a firework design based on inner and outer lengths,
+           and variables n1 and n2 to control the angles.
+
+           Parameters
+           ==========
+           outer: a multiplier for the outer radius. 
+           inner: a set inner radius "cutoff" to determine printing the char
+
+        '''
+        design = ''
+
+        # This is the (inside portion) of the outer circle (diameter)
+        # [-----][-----]
+
+        for i in range(outer*2):
+
+            # This is the (outer portion) of the same circle (diameter)
+            # [-----][-----][-----][-----]
+
+            for j in range(outer*4):
+
+                # We are scanning over values of x and y to define outer circle
+                x,y = (j-outer*2)/2,i-outer
+
+                # For each pair of x and y values we find the angle and radius. 
+                #   arctangent returns radians, and reflects quadrant.
+                #   A circle goes from 0 to 2pi radians
+                angle = math.atan2(y,x)
+                radius = math.sqrt(x**2 + y**2)
+
+                # We want a function of the angle to zig zag up and down.
+                #   We multiple the angle above by some factor (n1 or n2)
+                #   divide by pi and 2 so the result goes from 0 to 1
+                zigzag = min((angle*n1/math.pi)%2., (-angle*n2/math.pi)%2.)
+                
+
+                # Then from the angle we figure out the cutoff radius - 
+                #   some value between inner and outer based on the zigzag
+                #   that we want. 
+                cutoff = zigzag*(outer - inner) + inner
+
+                # (outer-inner) is the distance between outer and inner that 
+                # ranges from 0 (when zigzag is 0) to outer (when zigzag is 1). 
+                # This means that when zigzag is 0 it's scaled to none of the 
+                # distance, and when zigzag is 1 it's scaled to the entire 
+                # difference.
+
+                # Compare the actual radius to the cutoff radius. 
+                #   If actual radius is < cutoff radius --> fill in
+                #   otherwise put a blank space.
+                if radius < cutoff:
+                    design += char
+                else:
+                    design += ' '
+
+                # - At the end of a row, add a newline
+            design += '\n'
+
+        return design
+
+
+
     def generate_design(self, char1=None, char2=None, 
                               color1=None, color2=None,
                               offset=None, size=None):
@@ -129,6 +192,9 @@ class Firework(object):
         char2 = '%s%s\033[0m' %(color2, char2)
 
         # Step 4: generate the firework design
+        # Here we take two steps:
+
+        # 1. Create a background circle
 
         design = ''
 
@@ -145,6 +211,8 @@ class Firework(object):
             if i == size: i = size - 1
             padding = " "*(size-i + offset)
             design += '\n' + padding + i*("%s%s" %(char1,char2))
+
+        # and 2: overlay with design
 
         return design
 
