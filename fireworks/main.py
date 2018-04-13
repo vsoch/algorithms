@@ -109,7 +109,7 @@ class Firework(object):
                 self.oggle()
                 time.sleep(0.5)
                 
-            print(design)
+            print(design) # prevent blinking
             time.sleep(0.1)
             if clear:
                 print('\033c')

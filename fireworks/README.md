@@ -16,7 +16,8 @@ We are going to do the following:
  1. start with a number of fireworks, a start and end time
  2. randomly generate a firework, meaning design and size
  3. calculate trigger times for a firework depending on increasing size. This means that we start at the smallest size, and fire N times so that we fill the fireworks range between it's custom start and end time.
- 4. create an event loop so the N triggers fire within the larger range with the other fireworks.
+
+I had originally created an event loop so the fireworks went off at the same time, but it looks much nicer to run in serial (so the more techy cool thing doesn't look better in this case!)
 
  - [Writeup](https://vsoch.github.io/2018/fireworks/)
  - [My Solution](main.py)
@@ -33,5 +34,5 @@ You can change the number of fireworks and the end time, and this is how you con
 the speed.
 
 ```
-docker run -it vanessa/algorithms:fireworks --number 2000 --end 10
+docker run -it vanessa/algorithms:fireworks --number 2000
 ```
