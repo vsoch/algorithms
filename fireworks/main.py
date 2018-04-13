@@ -430,7 +430,7 @@ def fireworks_show(fireworks):
     '''
     for firework in fireworks:
         firework.boum()
-
+    print('Woohoo!')
 
 ################################################################################
 # Main
