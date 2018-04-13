@@ -16,7 +16,14 @@ import random
 import argparse
 import asyncio
 import string
+import math
 import time
+import sys
+
+
+################################################################################
+# Firework Object
+################################################################################
 
 
 class Firework(object):
@@ -35,10 +42,18 @@ class Firework(object):
         self.end = end                                # ending time
         self.duration = end-start
 
-        self.color = self.choose_color()
-        self.design = self.choose_design()
-        self.frequency = self.choose_frequency()
+        # Generate values in advance, for use later
 
+        self.color1 = self.choose_color()
+        self.color2 = self.choose_color()
+
+        # Firework characters
+
+        self.char1 = random.choice(',.*^`\'"')
+        self.char2 = self.choose_character()
+
+        self.offset = random.randint(0, 80)
+        self.size = random.choice(range(7, 19, 2))
 
     def __repr__(self):
         return self.__str__()
@@ -48,93 +63,107 @@ class Firework(object):
 
 
     def boum(self):
-        print("Boum! %s%s\033[0m" % ( self.color,
-                                      self.design ))
+        '''a firework "boum" will print all stages of the firework!
+        '''
+        show = self.ready()
+        for design in show:
+            print(design)
 
-                       
+
+    def _get_number_boums(self):
+        '''get the number of designs anticipated for the firework, depending
+           on its size
+        '''
+        return len(range(7, self.size, 2))
+
+
+    def ready(self):
+        '''prepare the show! This is an interator to reveal slowly increasing
+           in size fireworks. boum!
+        '''
+        for size in range(5, self.size, 2):
+            yield self.generate_design(size=size)
+
     def __str__(self):
         return "Firework (%05d:%05d)" % (self.start,
                                          self.end)
 
-    def choose_design(self):
-        '''choose a random design!
+    def choose_character(self):
+        '''choose a random character to be the predominant (larger of the two
+           designs).
         '''
-        chars = random.choice('!@#$%^*&( )_+}{')
-        choosefrom = string.ascii_letters + string.digits + chars 
-        design = random.choice(choosefrom)
-        size = random.randint(1,75)       
-        return design*size
+        return random.choice(string.ascii_letters + 
+                             string.digits + 
+                             '!@#$%^*&( )_+}{')
 
-    def choose_frequency(self):
-        '''choose a random frequency
+    def generate_design(self, char1=None, char2=None, 
+                              color1=None, color2=None,
+                              offset=None, size=None):
+        '''a firework will consist of two design characters, alternating in rows
+           increasing in size to form something that looks circular up to a max
+           width, and from some offset from the left.
+
+            ^,^,^
+          ^,^,^,^,^
+          ^,^,^,^,^
+            ^,^,^
+
         '''
-        frequencies = list(range(2,30,2))
-        return random.choice(frequencies)
+        # The character pattern, size, and offset for the firework 
+        char1 = char1 or self.char1
+        char2 = char2 or self.char2
+        color1 = color1 or self.color1
+        color2 = color2 or self.color2
 
+        # Width and offset from the left
+        size = size or self.size
+        offset = offset or self.offset
+
+        char1 = '%s%s\033[0m' %(color1, char1)
+        char2 = '%s%s\033[0m' %(color2, char2)
+
+        # Step 4: generate the firework design
+
+        design = ''
+
+        # Top half of firework 
+
+        for i in range(2, size, 2):
+            if i == size: i = size - 1
+            padding = " "*(size-i + offset)
+            design += '\n' + padding + i*("%s%s" %(char1,char2))
+
+        # Bottom half
+
+        for i in range(size, 2, -2):
+            if i == size: i = size - 1
+            padding = " "*(size-i + offset)
+            design += '\n' + padding + i*("%s%s" %(char1,char2))
+
+        return design
+
+ 
 
     def choose_color(self):
-        '''choose a random color!
+        '''choose a random color! We will add a background and make it bold.
         '''
 
-        colors = {'CYAN': "\033[36m",
-                  'PURPLE': "\033[95m",
-                  'RED': "\033[91m",
-                  'DARKRED': "\033[31m",
-                  'YELLOW': "\033[93m"}
+        colors = []
+        for style in range(8):
+            for fg in range(30,38):
+                s1 = ''
+                format = ';'.join([str(style), str(fg)])
+                s1 += '[%sm' % (format)
+                colors.append(s1)
 
-        key = random.choice(list(colors.keys()))
-        return colors[key]
+        return "\033" + random.choice(colors)
 
+    
 
+################################################################################
+# Helpers
+################################################################################
 
-def get_firework_schedule(start_time=0, 
-                          end_time=1000,
-                          alpha=0.1,
-                          delta=0):
-
-    '''get a random interval time between start time and end time.
-       Start time and end time should be in integer units.
-
-       Parameters
-       ==========
-       start_time: the starting time of the interval to uniformly select from        
-       end_time: the ending time of the interval to uniformly select from        
-       delta: the minimum change between start and end time before stopping
-       alpha: the size of the region (percentage of difference between
-              start and end) to sample from for new start and end times.
-
-    '''
-
-    schedule = []
-    change = 100
-
-    # The end time can't be less than start time.
-    if end_time < start_time:
-        print('end time %s cannot be at or before start %s' %(end_time,
-                                                              start_time))
-
-    # If we have a start time earlier or equal to end, break and return
-    while end_time > start_time and change > delta:
-
-        # We will operate in a tiny range between start and end
-        difference = end_time - start_time
-        change = int(alpha*difference)
-
-        # Select randomly from the small range for new start and end
-        start = random.randint(start_time, start_time+change)
-        end = random.randint(end_time-change, end_time)
-
-        # Otherwise, add to list and keep going!
-        firework = Firework(start,end)
-        schedule.append(firework)
-
-        start_time=firework.start
-        end_time=firework.end
-
-    return schedule
-
-
-# Decorators and helpers for printing
 
 def newline():
     print('-'*78)
@@ -154,65 +183,173 @@ def section(text):
  
 
 
+def generate_oggle():
+    '''generate an audience expression, with some padding on the left.
+    '''
+    oggle = random.choice(['Ooooooh!', "Again!",
+                           'Ahhhhh!', "Beautiful!",
+                           'Boom!', 'Amazing!',
+                           "Baby you're a...", "Woohoo!",
+                           'Pow!', 'Wow!', "Damn!",
+                           'Sizzle...', 'Whoa!',
+                           'Spa!', 'Ha!'])
+    padding = " "*int(random.uniform(0,75))
+    return padding + oggle
+
+
+
+
+
+################################################################################
+# Asyncio Running Loop
+################################################################################
+
+
+async def schedule_firework(loop, fireworks, length):
+    '''run the fireworks schedule, going from the start at time 0 and stopping
+       the loop at length specified
+
+       Parameters
+       ==========
+       loop: the event loop
+       fireworks: the list of firework objects
+       length: the total length of the show (in seconds)
+
+    '''
+
+    # The start of the show
+    start_time = loop.time()
+
+    for firework in fireworks:
+
+        # How many times does the firework need to fire?
+        count = firework._get_number_boums()
+
+        times = []
+        for ii in range(count+1):
+            # Bias closer to the end of the duration
+            weight = math.pow(random.uniform(0,1),0.5)
+            times.append(firework.duration*weight)
+
+        # Generate designs for the show
+        show = firework.ready()
+        for design in show:
+
+            # Callback function to print the firework
+            def boum(design):
+
+                # Every once in a while, print an oggle :)
+                if random.uniform(0,1) > 0.95:
+                    oggle = generate_oggle()
+                    print(oggle)
+
+                print(design, end='\r')
+
+            # Each design will be scheduled for later
+            trigger = times.pop(0)
+            loop.call_at(start_time + trigger, boum, design)
+
+    await asyncio.sleep(length)
+
+        
+
+def fireworks_show(fireworks, length):
+    '''create the loop of tasks to start the fireworks show!
+       
+       Parameters
+       ==========
+       fireworks: the schedule of fireworks!
+       length: how long the show will endure (cut after this many seconds)
+
+    '''
+    loop = asyncio.get_event_loop()
+    try:
+        print('Starting the show!')
+        loop.run_until_complete(schedule_firework(loop, fireworks, length))
+    finally:
+        print('Woohoo!')
+        loop.close()
+
+
+
+################################################################################
+# Main
+################################################################################
+
+
 def get_parser():
-
+    '''return the parser for main, giving the user access to all fireworks
+       generation options
+    '''
     parser = argparse.ArgumentParser(description='Fireworks Generator!')
-
     parser.add_argument('--alpha', '-a', type=float, default=0.01, dest='alpha',
                         help='''the size of the region (percentage of 
                                 difference between start and end) to sample''')
-
+    parser.add_argument('--number', '-n', type=int, default=100, dest='number',
+                        help='number of fireworks for the show')
     parser.add_argument('--start','-s', type=int, default=0, 
                         help='start time', dest='start')
-
     parser.add_argument('--end', '-e', type=int, default=500, 
                         help='end time', dest='end')
 
     return parser
 
 
+def get_firework_schedule(start_time=0, 
+                          end_time=1000,
+                          number=100,
+                          alpha=0.1,
+                          delta=0):
 
-@asyncio.coroutine
-def booms(firework, start_time):
+    '''get a random interval time between start time and end time.
+       Start time and end time should be in integer units.
 
-    # Time passed since starting the show
-    progress = time.time() - start_time
-
-    # Sleep and hand off to other fireworks if not time to start
-    while progress < firework.start:
-        yield from asyncio.sleep(firework.frequency)
-        progress = time.time() - start_time
-
-    # When we are over the start time, calculate ending 
-    ending = time.time() + firework.duration
-
-    # Keep firing until we reach the ending time
-    while time.time() < ending:
-        firework.boum()
-        yield from asyncio.sleep(firework.frequency)
-        
-
-def fireworks_show(fireworks):
-    '''create the loop of tasks to start the fireworks show!
-       
        Parameters
        ==========
-       fireworks: the schedule of fireworks!
+       start_time: the starting time of the interval to uniformly select from        
+       end_time: the set ending time for all fireworks, fireworks will end in
+                 small range (alpha) of this time.
+       number: the number of fireworks to deploy
+       delta: the minimum change between start and end time before stopping
+       alpha: the size of the region (percentage of difference between
+              start and end) to sample from for new start and end times.
 
     '''
-    print('Starting the show!')
-    loop = asyncio.get_event_loop()
-    start=time.time()
-    tasks = [asyncio.ensure_future(booms(firework, start)) for firework in fireworks ]
-    loop.run_until_complete(asyncio.wait(tasks))
-    loop.close()
+
+    schedule = []
+    count = 0
+
+    # The end time can't be less than start time.
+    if end_time < start_time:
+        print('end time %s cannot be at or before start %s' %(end_time,
+                                                              start_time))
+
+    # Keep going until we meet our quota
+    while count < number:
+
+        # We will operate in a tiny range between start and end
+        difference = end_time - start_time
+        change = int(alpha*difference)
+
+        # Select randomly from the small range for new start and end
+        start = random.randint(start_time, start_time+change)
+        end = random.randint(end_time-change, end_time)
+
+        # Otherwise, add to list and keep going!
+        firework = Firework(start,end)
+        schedule.append(firework)
+
+        start_time=firework.start
+        count+=1
+
+    return schedule
 
 
 def main():
     '''the entrypoint to the fireworks algorithm example. In
        this function, we:
  
-       1. generate a nested list of firework start and end times
+       1. generate a list of firework start and end times
        2. start the show to output an increasing firework size up until midpoint
        3. stop firing at stoppoint
 
@@ -223,10 +360,12 @@ def main():
         args = parser.parse_args()
     except:
         parser.print_help()
+        sys.exit(1)
 
     section('Generating fireworks schedule!...\n')
     schedule = get_firework_schedule(start_time=args.start,
                                      end_time=args.end,
+                                     number=args.number,
                                      alpha=args.alpha)
 
     print('The schedule has %s fireworks!' %len(schedule))
@@ -234,7 +373,7 @@ def main():
     print('  [end time]: %s' %args.end)
     print('     [alpha]: %s' %args.alpha)
 
-    fireworks_show(schedule)
+    fireworks_show(schedule, args.end)
 
 if __name__ == "__main__":
     main()
