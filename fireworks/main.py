@@ -1,16 +1,22 @@
 #!/usr/bin/env python
 
 # Given a larger start and ending range, create some kind of fireworks 
-# display so that they come on gradually, and fade out gradually. 
-# We want nested events, something that looks like: 
+# display so that they come on gradually, and climax and then the show
+# ends.
+# We want events with a staggered start, something that looks like: 
 
 # (s=start,e=end, and the number indicates the firework number!)
-# [start]  [s1] [s2] [s3] [sN] .. [eN] [e3] [e2] [e1]  [end]
+# [start]  [s1]   [s2]  [s3]  [s4] [s5][s6][sN] [end]
 
-# We would want to know, for some range from start to end, what is the value 
-# of N such that firework N starts after N-1, and finishes before it? 
-# I think we can do this recursively, with a stopping condition 
-# that the start is equal to the end time.
+# We are going to do the following:
+# 1. start with a number of fireworks, a start and end time
+# 2. randomly generate a firework, meaning design and size
+# 3. calculate trigger times for a firework depending on increasing size. This
+#    means that we start at the smallest size, and fire N times so that we fill
+#    the fireworks range between it's custom start and end time.
+# 4. create an event loop so the N triggers fire within the larger range with
+#    the other fireworks.
+
 
 import random
 import argparse
