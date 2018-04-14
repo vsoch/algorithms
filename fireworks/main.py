@@ -229,9 +229,9 @@ class Firework(object):
 
 
     def generate_center(self, char1, char2, size, offset, matrix=False):
-        ''' The core of the firework is the glowing orb where the explosion
-            happens! It just needs to be circular and fluctuate between
-            two colors. The core will consist of two design characters, 
+        ''' This firework deisgn is a glowing orb. It just needs to be circular 
+            and fluctuate between two colors, and could be center for a more
+            complex design. The core will consist of two design characters, 
             alternating in rows increasing in size to form something that 
             looks circular up to a max width, and from some offset from the left.
 
@@ -322,70 +322,9 @@ class Firework(object):
                                          offset=offset)
 
   
-        # Case 3:?
-        # use matrix generation
-        #   so we can combine later. This means two steps:
-
-        #   1. Create a background design (one color)
-        #   2. overlay center "boum" on background! (two colors)
-
-            # The shape, X by Y is (offset x 2) by ()
-            # 2. Create center "boum" region
-
-            #center = self.generate_center(size=size,
-            #                              char1=char1,
-            #                              char2=char2,
-            #                              offset=0,     # Offset added later
-            #                              matrix=True)
-
-            # 3. Combine!
-            #design = self.merge_designs(background, center, offset)
-
         return design
 
  
-    def merge_designs(self, background, center, offset=None):
-        '''a rough algorithm for merging the center with the background.
-           We estimate the center row and column of the background, and do
-           a (rounded) transformation of the center to that point.
-        '''
-
-        design = ''
-    
-        # background is a list of rows
-        #   so its length is # rows
-        # background[0] is a list that turns into a row
-        #   so its length is the number of columns
-        
-        # Difference in number rows (background is always larger)
-
-        rowdiff = len(background) - len(center)
-        rowpad = int(rowdiff/2)
-
-        # The approx center column (half width of the background)
-
-        centercol = int(len(background[0])/2)
-        
-        # We need the center of the center design to be at centercol
-        # (padding) + 0.5*(center width) = centercol
-        
-        colpad = int( centercol - (len(center[0]) ))
-
-        # We will iterate through center coordinates
-
-        for col in range(len(center)):
-            for row in range(len(center[0])):
-
-                # The character is a character plus color with escape sequence
-                char = center[col][row]
-
-                # And add the character transformed to background space
-                if char != ' ':
-                    background[row+rowpad][col+colpad] = char
-
-        return ''.join([''.join(col) for col in background])
-
-
     def choose_color(self):
         '''choose a random color! We will add a background and make it bold.
         '''
@@ -424,8 +363,6 @@ def section(text):
     newline()
  
 
-        
-
 def fireworks_show(fireworks):
     '''create the loop of tasks to start the fireworks show!
        
@@ -437,6 +374,7 @@ def fireworks_show(fireworks):
     for firework in fireworks:
         firework.boum()
     print('Woohoo!')
+
 
 ################################################################################
 # Main
@@ -518,8 +456,8 @@ def main():
        this function, we:
  
        1. generate a list of firework start and end times
-       2. start the show to output an increasing firework size up until midpoint
-       3. stop firing at stoppoint
+       2. start the show and fire in sequence, with increasing size 
+       3. the show ends when we run out of fireworks
 
     '''
     parser = get_parser()
