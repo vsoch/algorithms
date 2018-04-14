@@ -1,6 +1,6 @@
 FROM continuumio/miniconda3
 
-# docker build -t vanessa/interview-scheduling .
+# docker build -t vanessa/algorithms:interview-scheduling .
 
 RUN mkdir /code
 ADD . /code
