@@ -35,7 +35,7 @@ import sys
 
 class Firework(object):
 
-    def __init__(self, end, start=0, size=None, simple=None):
+    def __init__(self, end, start=0, size=None, simple=None, design=None):
         '''a Firework object holds the start and end time for firing a firework,
            along with functions to fire them! We only need the duration to
            estimate a range of trigger (firing times) for the firework.
@@ -53,7 +53,28 @@ class Firework(object):
         self.end = end                                # ending time
         self.duration = end-start
 
-        # Generate values in advance, for use later
+        # Colors and Characters
+
+        self.randomize()
+
+        # Sizing
+
+        self.offset = random.randint(0, 40)
+        self.inner = random.choice( range( 0, 15 ))
+        self.size = size or random.choice(range(7, 21, 2))
+
+        # Design Complexity
+
+        self.simple = self.choose_complexity(simple)
+        self.thresh = design or random.choice(range(1,50))
+
+    def __repr__(self):
+        return self.__str__()
+
+    def randomize(self):
+        '''set colors and characters for the firework. Called upon 
+           init, and can be called later to create a new design.
+        '''
 
         self.color1 = self.choose_color()
         self.color2 = self.choose_color()
@@ -65,21 +86,10 @@ class Firework(object):
         self.char2 = self.choose_character()
         self.bgchar = self.choose_character()
 
-        # Sizing
-
-        self.offset = random.randint(0, 40)
-        self.inner = random.choice( range( 0, 15 ))
-        self.size = size or random.choice(range(7, 21, 2))
-
-        # Design Complexity
+        # Design
 
         self.thresh = random.choice(range(1,50))
-        self.simple = simple or random.choice([True, False])
 
-
-
-    def __repr__(self):
-        return self.__str__()
 
     def speak(self):
         print("Baby I'm a %s!" %str(self))
@@ -133,7 +143,7 @@ class Firework(object):
                 self.oggle()
                 time.sleep(0.5)
                 
-            print(design) # prevent blinking
+            print(design)
             time.sleep(0.1)
             if clear:
                 print('\033c')
@@ -171,6 +181,21 @@ class Firework(object):
         return random.choice(string.ascii_letters + 
                              string.digits + 
                              '!@#$%^*&( )_+}{')
+
+
+    def choose_complexity(self, simple=None):
+        '''a simple design uses generate_design, and a 
+           simple complexity uses "generate_shape"
+
+           Parameters
+           ==========
+           simple: boolean or None. If None, randomly select True/False
+                   otherwise, use what is given.
+        ''' 
+
+        if simple is None:
+            simple = random.choice([True, False])
+        return simple
 
 
     def generate_shape(self, char='O', n1=15, n2=15, offset=None,
@@ -415,10 +440,14 @@ def get_parser():
                         help='size of region to sample to determine durations')
     parser.add_argument('--boum', default=False, action="store_true",
                         help='forget the show, generate and boum a firework!')
+    parser.add_argument('--design', '-d', type=int, default=None, dest='design',
+                        help='parameter N to drive the design.')
     parser.add_argument('--size', '-s', type=int, default=None, dest='size',
                         help='maximum size of firework (undefined for random)')
     parser.add_argument('--simple', default=None, action="store_true",
                         help='just return a simple design.')
+    parser.add_argument('--complex', default=None, action="store_true",
+                        help='choose a complex design firework')
     parser.add_argument('--number', '-n', type=int, default=1000, dest='number',
                         help='number of fireworks for the show')
     parser.add_argument('--end', '-e', type=int, default=100, 
@@ -431,6 +460,8 @@ def get_parser():
 def get_firework_schedule(end_time=1000,
                           start_time=0,
                           number=100,
+                          design=None,
+                          simple=None,
                           alpha=0.1):
 
     '''get a random interval time between start time and end time.
@@ -467,7 +498,7 @@ def get_firework_schedule(end_time=1000,
         end = random.randint(end_time-change, end_time)
 
         # Otherwise, add to list and keep going!
-        firework = Firework(start, end)
+        firework = Firework(start=start, end=end, design=design, simple=simple)
         schedule.append(firework)
 
         start_time=firework.start
@@ -493,20 +524,39 @@ def main():
         parser.print_help()
         sys.exit(1)
 
+    # Get user preference for design, complex gets priority
+    design_type = "random"
+    simple = None
+
+    if args.complex is True:
+        simple = False
+        design_type = "complex"
+
+    elif args.simple is True:
+        simple = True
+        design_type = "simple"
+
+    
     # Just generate one firework and exit
 
     if args.boum is True:
-        firework = Firework(end=args.end, size=args.size, simple=args.simple)
+        firework = Firework(end=args.end,
+                            size=args.size,
+                            simple=simple,
+                            design=args.design)
         firework.boum()
         sys.exit(0)
 
     section('Generating fireworks schedule!...\n')
     schedule = get_firework_schedule(end_time=args.end,
+                                     design=args.design,
+                                     simple=simple,
                                      number=args.number,
                                      alpha=args.alpha)
 
     print('The schedule is prepared!')
-    print('  [fireworks]: %s' %len(schedule))
+    print('   [fireworks]: %s' %len(schedule))
+    print('      [design]: %s' %design_type)
     time.sleep(2.0)
 
     fireworks_show(schedule)
