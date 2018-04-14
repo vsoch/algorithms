@@ -23,16 +23,43 @@ I had originally created an event loop so the fireworks went off at the same tim
  - [My Solution](main.py)
 
 
-## Docker
+## Usage
+If you want to see this post in action:
 
 ```bash
-# Random selection of N
 docker run -it vanessa/algorithms:fireworks
 ```
 
-You can change the number of fireworks and the end time, and this is how you control
-the speed.
+or forget an entire show, just generate one random "boum"
 
+```bash
+docker run -it vanessa/algorithms:fireworks --boum
 ```
-docker run -it vanessa/algorithms:fireworks --number 2000
+
+That will automatically select between complex and simple designs. To force a simple 
+or a complex design:
+
+```bash
+docker run -it vanessa/algorithms:fireworks --boum --simple
+docker run -it vanessa/algorithms:fireworks --boum --complex
 ```
+
+You can also control the firework size:
+
+```bash
+docker run -it vanessa/algorithms:fireworks --boum --simple --size 5
+```
+
+Or the specific kind of `--complex` design (try a random integer!):
+
+```bash
+docker run -it vanessa/algorithms:fireworks --boum --complex --design 5
+```
+
+or generate an entire fireworks show with one kind of complex design:
+
+```bash
+docker run -it vanessa/algorithms:fireworks --complex --design 5
+```
+
+Read more about the algorithm or watch [shows here](https://vsoch.github.io/2018/fireworks/)
