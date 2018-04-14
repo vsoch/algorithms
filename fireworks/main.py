@@ -87,14 +87,37 @@ class Firework(object):
     def oggle(self):
         '''generate an audience expression, with some padding on the left.
         '''
-        oggle = random.choice(['Ooooooh!', "Again!",
-                               'Ahhhhh!', "Beautiful!",
-                               'Boom!', 'Amazing!',
-                               "Baby you're a...", "Woohoo!",
-                               'Pow!', 'Wow!', "Damn!",
-                               'Sizzle...', 'Whoa!',
-                               'Spa!', 'Ha!'])
 
+        oggles = ['Again!',
+                  'Ahhhhh!',
+                  'Amazing!',
+                  'Avocado!',
+                  "Baby you're a...",
+                  "Bam!",
+                  "Bang!",
+                  'Beautiful!',
+                  'Boom!',
+                  'Crackle...',
+                  'Damn!',
+                  'Did you see that?',
+                  "Fizz...",
+                  'Ha!',
+                  "Hiss...",
+                  'Kaboom!',
+                  'Look!',
+                  'Magical!',
+                  'Omg!',
+                  'Ooooooh!',
+                  'Pow!',
+                  'Sizzle...',
+                  'Spa!',
+                  'Whoa!',
+                  'Woohoo!',
+                  'Wow!',
+                  'Wowza!',
+                  "Whoosh!"]
+
+        oggle = random.choice(oggles)
         padding = " "*int(random.uniform(0,75))
         print(padding + oggle)
 
@@ -115,6 +138,7 @@ class Firework(object):
             if clear:
                 print('\033c')
 
+
     def count_designs(self):
         '''get the number of designs anticipated for the firework, depending
            on its size
@@ -133,6 +157,7 @@ class Firework(object):
         for size in range(number):
             inner = self.inner - delta
             yield self.generate_design(size=size, inner=inner)
+
 
     def __str__(self):
         return "Firework (%05d:%05d)" % (self.start,
@@ -327,15 +352,14 @@ class Firework(object):
 
  
     def choose_color(self):
-        '''choose a random color! We will add a background and make it bold.
+        '''choose a random color! We will add a style and background sometimes.
         '''
-
         colors = []
         for style in range(8):
             for fg in range(30,38):
                 s1 = ''
                 format = ';'.join([str(style), str(fg)])
-                s1 += '[%sm' % (format)
+                s1 += '[%s;1m' % (format)
                 colors.append(s1)
 
         return "\033" + random.choice(colors)
@@ -483,7 +507,7 @@ def main():
 
     print('The schedule is prepared!')
     print('  [fireworks]: %s' %len(schedule))
-    print('      [alpha]: %s' %args.alpha)
+    time.sleep(2.0)
 
     fireworks_show(schedule)
 
