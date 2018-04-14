@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# Copyright (c) 2018, Vanessa Sochat
+# All rights reserved.
+
 # Given a larger start and ending range, create some kind of fireworks 
 # display so that they come on gradually, and climax and then the show
 # ends.
@@ -11,11 +14,9 @@
 # We are going to do the following:
 # 1. start with a number of fireworks, a start and end time
 # 2. randomly generate a firework, meaning design and size
-# 3. calculate trigger times for a firework depending on increasing size. This
-#    means that we start at the smallest size, and fire N times so that we fill
-#    the fireworks range between it's custom start and end time.
-# 4. create an event loop so the N triggers fire within the larger range with
-#    the other fireworks.
+# 3. calculate trigger times for a firework depending on increasing size. 
+#
+# See LICENSE in the repository root
 
 
 import random
