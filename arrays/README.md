@@ -73,3 +73,43 @@ nexts = next_largest_element(A)
 #  [-1, 2, 3, 4, -1]
 ```
 
+We would have a much easier time if we could sort this, but we can't because the ordering is
+important. So let's just remember the ordering then!
+
+```
+A = [5,1,2,3,4]
+lookup = dict()
+
+# Create a lookup dictonary of indices where the element lives
+# We know there aren't repeats
+for i in range(len(A)):
+    element = A[i]
+    lookup[element] = i
+
+# Sort A now and loop through it only up to itself
+A.sort()
+
+# We need 2 elements minimally
+while len(A) > 0:
+
+    # Set next greater as default to -1, in case we don't find answer
+    first_number = A.pop(0)
+    next_greater = -1
+
+
+    if len(A) > 0:
+        next_number = A[0]    
+
+        first_index = lookup[first_number]
+        next_index = lookup[next_number]
+        if next_index > first_index:
+            next_greater = A[0]
+    print('The next greatest number for %s is %s' %(first_number, next_greater))  
+```
+```
+The next greatest number for 1 is 2
+The next greatest number for 2 is 3
+The next greatest number for 3 is 4
+The next greatest number for 4 is -1
+The next greatest number for 5 is -1
+```
