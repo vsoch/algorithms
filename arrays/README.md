@@ -89,14 +89,14 @@ for i in range(len(A)):
 # Sort A now and loop through it only up to itself
 A.sort()
 
-# We need 2 elements minimally
+# We need 1 element minimally
 while len(A) > 0:
 
     # Set next greater as default to -1, in case we don't find answer
     first_number = A.pop(0)
     next_greater = -1
 
-
+    # If we have popped the last element, can't have another bigger!
     if len(A) > 0:
         next_number = A[0]    
 
