@@ -93,21 +93,29 @@ Here is how I thought about this.
 ```
 
 L=numpy.zeros(shape=(len(A),len(B)))
-for a in range(1, len(A)):
-    for b in range(1, len(B)):
-        left = L[a-1, b]
-        up = L[a, b-1]
-        diag = L[a-1,b-1]
-        longest = max(left, up, diag)
+for a in range(0, len(A)):
+    for b in range(0, len(B)):
+
+        left = 0
+        if a >= 1:
+            left = L[a-1, b]
+
+        up = 0
+        if b >=1:
+            up = L[a, b-1]
+        
+        diag = 0
+        if a >=1 and b >=1:
+            diag = L[a-1,b-1]
 
         # if they aren't the same, the current longest for the coordinate is
         # whichever of the last overlap was bigger
         if A[a] != B[b]:
-            L[a,b] = longest
+            L[a,b] = max(left, up)
 
         # If they are the same, we add 1 to continued last longest
         else:
-            L[a,b] = longest +1
+            L[a,b] = diag +1
 ```
 
 This gives us a matrix like this:
@@ -115,14 +123,16 @@ This gives us a matrix like this:
 ```python
 
 L
-array([[ 0.,  0.,  0.],
-       [ 0.,  1.,  1.],
-       [ 0.,  1.,  2.],
-       [ 0.,  1.,  3.],
-       [ 0.,  2.,  3.]])
+array([[ 1.,  1.,  1.],
+       [ 1.,  1.,  2.],
+       [ 1.,  2.,  2.],
+       [ 1.,  2.,  2.],
+       [ 1.,  2.,  3.]])
 ```
 
-and if we look at L[4,2] (the max coordinate of our i and j, and the bottom right)
+In retrospect I could have made the matrix one bigger in each dimension to allow for
+indexing the negative one value (e.g., L[a-1,b] when a==0 would have been put in the first
+spot) but this works. If we look at L[4,2] (the max coordinate of our i and j, and the bottom right)
 we can easily see the length of the maximum common subsequence is 3. But this would
 be hard to use and go back to translate to letters, right? So I decided to try the
 same strategy, but instead of storing the length in the cell, storing the actual longest
@@ -134,27 +144,35 @@ I'll just use the len() of each string in the list for length.
 ```python
 
 L=[['']*len(B) for a in range(len(A))]
-for a in range(1, len(A)):
-    for b in range(1, len(B)):
-        left = L[a-1][b]
-        up = L[a][b-1]
-        diag = L[a-1][b-1]
-        longest = max([left, up, diag], key=len)
+for a in range(0, len(A)):
+    for b in range(0, len(B)):
+
+        left = ''
+        if a >= 1:
+            left = L[a-1][b]
+
+        up = ''
+        if b >=1:
+            up = L[a][b-1]
+        
+        diag = ''
+        if a >=1 and b >=1:
+            diag = L[a-1][b-1]
 
         # if they are the same, add the letter there to previous
         if A[a] == B[b]:
-            L[a][b] = "%s%s" %(longest, A[a])
+            L[a][b] = "%s%s" %(diag, A[a])
         else:
-            L[a][b] = longest
+            L[a][b] = max([left, up], key=len)
 ```
 The matrix now looks like this:
 
 ```python
-[['', '', ''],
- ['', '', 'b'],
- ['', 'a', 'b'],
- ['', 'aa', 'aa'],
- ['', 'aa', 'aab']]
+[['a', 'a', 'a'],
+ ['a', 'a', 'ab'],
+ ['a', 'aa', 'ab'],
+ ['a', 'aa', 'ab'],
+ ['a', 'aa', 'aab']]
 ```
 
 And if I wanted to remember the longest, I could just add a variable to do that.
@@ -162,27 +180,39 @@ And if I wanted to remember the longest, I could just add a variable to do that.
 ```python
 
 def lcs(A,B):
-    answer = ''
+    '''return the longest common substring (lcs) between two strings, A and B.
+    '''
     L=[['']*len(B) for a in range(len(A))]
-    for a in range(1, len(A)):
-        for b in range(1, len(B)):
-            left = L[a-1][b]
-            up = L[a][b-1]
-            diag = L[a-1][b-1]
-            longest = max([left, up, diag], key=len)
+    for a in range(0, len(A)):
+        for b in range(0, len(B)):
+
+            left = ''
+            if a > 0:
+                left = L[a-1][b]
+
+            up = ''
+            if b > 0:
+                up = L[a][b-1]
+        
+            diag = ''
+            if a > 0 and b > 0:
+                diag = L[a-1][b-1]
 
             # if they are the same, add the letter there to previous
             if A[a] == B[b]:
-                longest = "%s%s" %(longest, A[a])
-            L[a][b] = longest
+                L[a][b] = "%s%s" %(diag, A[a])
+            else:
+                L[a][b] = max([left, up], key=len)
+            
 
-            if len(longest) > len(answer):
-                answer = longest
+    return L[a][b]
 
-    return answer
 ```
 ```python
 
 lcs(A,B)
 'aab'
 ```
+
+The complexity of this is O(N^2) because in the worst case we have to go through the
+entire of A and the entire of B to derive the matrix.
