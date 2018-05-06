@@ -7,23 +7,34 @@
 
 class Process(object):
 
-    def __init__(self, pid, burst_time):
+    def __init__(self, pid, burst_time, arrival_time):
         self.pid = pid
         self.burst_time = burst_time
+        self.arrival_time = arrival_time
  
 
 class FCFOQueue(object):
 
-    def __init__(self, pids, burst_times):
+    def __init__(self, pids, burst_times, arrival_times=None):
+
+        # If no arrival times, assume all arriving at time 0
+
+        if not arrival_times:
+            arrival_times = [0 for x in range(len(pids))]
 
         print('First Come First Out Process Control Block!\n')
         self.processes = []
         for p in range(len(pids)):
             pid = pids[p]
             burst_time = burst_times[p]
-            process = Process(pid, burst_time)
+            arrival_time = arrival_times[p]
+            process = Process(pid, burst_time, arrival_time)
             self.processes.append(process)
-        
+ 
+        # Sort processes by arrival times
+        self.processes.sort(key=lambda x: x.arrival_time, reverse=True)
+       
+
     def __str__(self):
         return "first-come-first-out-queue:%s" %(len(self.processes))
 
@@ -40,11 +51,17 @@ class FCFOQueue(object):
  
         # let's count time in general units
         wait_times = []
-        current = wait_time = 0
 
+        # Elapsed start is the first arrival time
+        current = wait_time = self.processes[0].arrival_time
+
+        # These should already be sorted by arrival time
         for p in self.processes:
             
             # We won't actually wait :)
+            # if arrival time is in future, just use this
+            if p.arrival_time > current:
+                current = p.arrival_time
 
             # The first process has wait time of zero
             wait_times.append(wait_time)
