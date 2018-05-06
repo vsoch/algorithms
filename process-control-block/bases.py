@@ -18,7 +18,6 @@ class FCFOQueue(object):
     def __init__(self, pids, burst_times, arrival_times=None):
 
         # If no arrival times, assume all arriving at time 0
-
         if not arrival_times:
             arrival_times = [0 for x in range(len(pids))]
 
@@ -34,7 +33,6 @@ class FCFOQueue(object):
         # Sort processes by arrival times
         self.processes.sort(key=lambda x: x.arrival_time, reverse=True)
        
-
     def __str__(self):
         return "first-come-first-out-queue:%s" %(len(self.processes))
 
@@ -51,17 +49,13 @@ class FCFOQueue(object):
  
         # let's count time in general units
         wait_times = []
-
-        # Elapsed start is the first arrival time
         current = wait_time = self.processes[0].arrival_time
 
-        # These should already be sorted by arrival time
         for p in self.processes:
             
             # We won't actually wait :)
-            # if arrival time is in future, just use this
-            if p.arrival_time > current:
-                current = p.arrival_time
+            # if the arrival 
+            wait_time = wait_time - p.arrival_time
 
             # The first process has wait time of zero
             wait_times.append(wait_time)
@@ -71,7 +65,6 @@ class FCFOQueue(object):
             current = wait_time
                         
         return wait_times
-
 
     def calculate_turnaround_times(self, wts=None):
         '''the turnaround time is how long it takes to wait, start, and finish

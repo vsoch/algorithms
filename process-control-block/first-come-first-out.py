@@ -38,12 +38,13 @@ def main():
 
     # 1-Input the processes along with their burst time (bt).
     pids = [1, 2, 3]
-
-    # Burst time is time takes CPU to get running
     burst_times = [10, 5, 8]
 
     # Create the FCFO Queue
     queue = FCFOQueue(pids, burst_times)
+
+    # Burst time is time takes CPU to get running
+    print('     Burst times: %s' %' | '.join(str(x) for x in burst_times))
 
     # 2 - Find waiting time (wt) for all processes.
     wts = queue.calculate_waiting_times()
