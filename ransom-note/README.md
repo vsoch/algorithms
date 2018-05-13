@@ -56,16 +56,22 @@ def is_cut_from_magazine(magazine, note):
 
     print("Can the note be formed from the magazine? %s" %possible)
     return possible
+```
 
 ### Example Where it Can be Cut
+
+```python
 magazine = 'tejumpedbthhappyerolazywwasuovericnkqfogxohdheand'
 note = 'jumpifyoudare'
 
 is_cut_from_magazine(magazine, note)
-Can the note be formed from the magazine? True
-Out[7]: True
+# Can the note be formed from the magazine? True
+# True
+```
 
 ### Example Where it Cannot
+
+```python
 magazine = 'tejumpedbthhappye'
 note = 'jumpifyoudarezzzzzz'
 is_cut_from_magazine(magazine, note)
@@ -83,12 +89,14 @@ this means? The equation doesn't change at all! That's pretty neat :)
 magazine = ['I', 'wonder', 'as', 'I', 'wander']
 note = ['I', 'wander']
 is_cut_from_magazine(magazine, note)
-Can the note be formed from the magazine? True
-Out[3]: True
+# Can the note be formed from the magazine? True
+# True
+```
 
+```python
 magazine = ['I', 'wonder', 'as', 'I', 'wander']
 note = ['I', 'wander', 'where', 'my', 'shoes', 'are']
 is_cut_from_magazine(magazine, note)
-Can the note be formed from the magazine? False
-Out[4]: False
+# Can the note be formed from the magazine? False
+# False
 ```
