@@ -185,3 +185,5 @@ We can then run the above and get the longest, 'cbebebe'. I realize that it's
 probably not super efficient to do this in two steps - generating
 all the substrings and then testing, but it's so much more clean and logical, and
 so is a solution I'm happy with.
+
+Note - I wound up optimizing this further! See [here](https://vsoch.github.io/2018/longest-k-substring/).
