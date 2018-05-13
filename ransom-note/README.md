@@ -8,7 +8,7 @@
  - We have to assume that the count of the words is relevant (e.g., if I use a word from the magazine and there is only one, I can't use it again)
  - Empty string is not a word
  - The note is not empty, meaning that the empty string cannot be considered a valid note
-
+ - Since we cut out of the magazine, capitalization is important.
 
 Let's simplify the problem by changing it to:
 
@@ -24,7 +24,6 @@ Let's simplify the problem by changing it to:
  5. If we make it through the whole thing, success
 
 ```python
-
 
 def is_cut_from_magazine(magazine, note):
 
@@ -71,4 +70,25 @@ magazine = 'tejumpedbthhappye'
 note = 'jumpifyoudarezzzzzz'
 is_cut_from_magazine(magazine, note)
 False
+```
+
+# Extend to words
+We now need to tweak the problem to be about words and not letters. This is fairly
+easy, except instead of keeping a count of strings, we keep a count of words. We also
+care about capitalization, since cutting "Apple" from a magazine is different than cutting
+"apple." This just means we won't take the lowercase of the content. And you know what else
+this means? The equation doesn't change at all! That's pretty neat :)
+
+```python
+magazine = ['I', 'wonder', 'as', 'I', 'wander']
+note = ['I', 'wander']
+is_cut_from_magazine(magazine, note)
+Can the note be formed from the magazine? True
+Out[3]: True
+
+magazine = ['I', 'wonder', 'as', 'I', 'wander']
+note = ['I', 'wander', 'where', 'my', 'shoes', 'are']
+is_cut_from_magazine(magazine, note)
+Can the note be formed from the magazine? False
+Out[4]: False
 ```
