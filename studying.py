@@ -78,9 +78,65 @@ for idx in range(len(big)):
         next = next+1
 
 
-################################################################################  
-# 3. A ransom note can be formed by cutting words out of a magazine to form a 
-# new sentence. How would you figure out if a ransom note (represented as a 
-# string) can be formed from a given magazine (string)?
+## Sorting
+
+A = 'AAACCDEGEFDGBBBAAACCCDDD'
+
+def insertion_sort(A):
+
+    if not isinstance(A, list):
+        A = list(A)
+
+    # Grab first set of two in pair
+    for a in range(len(A)-1):
+
+        # Grab second in pair
+        for b in range(a+1, len(A)):
+
+            # If the second is less than the first, swap
+            if A[b] < A[a]:
+                A[b], A[a] = A[a], A[b]
+
+    return A
 
 
+
+# Given two (singly) linked lists, determine if the two lists intersect. Return the inter-
+# secting node. Note that the intersection is defined based on reference, not value. That is, if the kth
+# node of the first linked list is the exact same node (by reference) as the jth node of the second
+# linked list, then they are intersecting
+
+class Node(object):
+ 
+    def __init__(self, value, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right
+
+    
+class LinkedList(object):
+
+    def __init__(self):
+        self.start_node
+
+    def add(self, value):
+
+        if self.start_node is None:
+            node = Node(value)
+            self.start_node = node
+        else:
+
+            end_node = None
+            contender = self.start_node
+
+            # Traverse to end of linked list
+            while end_node is None:
+                if contender.right is None:
+                    end_node = contender
+
+            # Create a new node
+            node = Node(value, left=contender)
+            print('Added node %s' %node)
+
+
+    def remove_by_value():
