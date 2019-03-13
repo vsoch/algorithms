@@ -23,37 +23,29 @@ class Graph:
         while queue:
 
             # Important removes from end!
-            source = queue.pop()
+            source = queue.pop(-1)
+            visited[source] = True
             print(source)
             for node in self.graph[source]:    
                 if not visited[node]:
                     visited[node] = True
                     queue.append(node)
 
-# Option 1- with recursion, one function
 
-class Graph:
+# Create a graph
+g = Graph() 
+g.add_edge(0, 1) 
+g.add_edge(0, 2) 
+g.add_edge(1, 2) 
+g.add_edge(2, 0) 
+g.add_edge(2, 3) 
+g.add_edge(3, 3) 
+  
+g.dfs(2)
 
-    def __init__(self):
-        self.graph = dict()
+print()
 
-    def add_edge(self, key, value):
-        if key not in self.graph:
-            self.graph[key] = []
-        self.graph[key].append(value)
-
-    def dfs(self, source, visited=None):
-
-        if visited == None:
-            visited = {node: False for node in self.graph}
-        
-        print(source)
-        for node in self.graph[source]:    
-            if not visited[node]:
-                self.dfs(node, visited)
-
-
-# Option 1- with recursion, helper function
+# Option 2 - with recursion, helper function
 
 class Graph:
 
@@ -68,6 +60,7 @@ class Graph:
     def dfs_helper(self, source, visited):
 
         visited[source] = True
+        print(source)
         for node in self.graph[source]:
             if visited[node] == False:
                 visited[node] = True
@@ -79,4 +72,15 @@ class Graph:
         visited = {node: False for node in self.graph}
         
         # Call helper function
-        self.dfs_helper(node, visited)
+        self.dfs_helper(source, visited)
+
+# Create a graph
+g = Graph() 
+g.add_edge(0, 1) 
+g.add_edge(0, 2) 
+g.add_edge(1, 2) 
+g.add_edge(2, 0) 
+g.add_edge(2, 3) 
+g.add_edge(3, 3) 
+  
+g.dfs(2)
