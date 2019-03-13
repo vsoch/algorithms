@@ -42,7 +42,7 @@ class LinkedList:
 
             # When the loop breaks, either the next is None, or our node value is greater
             node.next = current.next
-            current.next == node
+            current.next = node
                  
     # Utility function to prit the linked LinkedList 
     def printList(self): 
