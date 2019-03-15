@@ -35,3 +35,5 @@ def find_min_depth(root):
     return 1+ min(find_min_depth(root.left),find_min_depth(root.right))
     
 print(find_min_depth(root))
+
+# If we want to make it max, just change min to max!
