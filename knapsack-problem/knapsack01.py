@@ -1,7 +1,4 @@
-#A naive recursive implementation of 0-1 Knapsack Problem 
-  
-# Returns the maximum value that can be put in a knapsack of 
-# capacity W 
+# Returns the maximum value that can be put in a knapsack of max_weight
 def knapsack(max_weight, weights, values, n): 
   
     # base case - max weight is 0 or number of items is 0
@@ -19,8 +16,7 @@ def knapsack(max_weight, weights, values, n):
     else: 
         return max(values[n-1] + knapsack(max_weight - weights[n-1], weights, values, n-1), # included
                    knapsack(max_weight, weights, values, n-1))
-  
-  
+    
 values = [60, 100, 120] 
 weights = [10, 20, 30] 
 max_weight = 50
