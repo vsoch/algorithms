@@ -69,7 +69,7 @@ def longest_palindrome_substructure(string):
             j = coord[1] + 1
 
             # Must be in bounds to check
-            if i > 0 and j < len(string):
+            if i >= 0 and j < len(string):
                 if string[i] == string[j]:
                     lookup[length].append((i,j))
 
