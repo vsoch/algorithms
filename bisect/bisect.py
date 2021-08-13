@@ -26,7 +26,7 @@ def right_bisect(sorted_list, element):
         idxMiddle = (idxLeft + idxRight) // 2
         middle = sorted_list[idxMiddle]
         if middle <= element:
-            idxLeft = idxMiddle
+            idxLeft = idxMiddle + 1
         elif middle > element:
-            idxRight = idxMiddle - 1
+            idxRight = idxMiddle
     return idxRight
