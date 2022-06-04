@@ -18,22 +18,22 @@ answer = []
 while True:
 
     if not h and idx > len(numbers):
-        break   
+        break
     idx += 1
 
     # If we don't have k yet, keep adding.
     if len(h) < k and numbers and idx < len(numbers):
-        print(f'pushing {numbers[idx]} to {h}')
-        heapq.heappush(h, numbers[idx])     
+        print(f"pushing {numbers[idx]} to {h}")
+        heapq.heappush(h, numbers[idx])
 
     # Else if it's == (and shouldn't be greater) and we have numbers left, we pop and add
     elif numbers and idx < len(numbers):
         answer.append(heapq.heappushpop(h, numbers[idx]))
-        print(f'adding {numbers[idx]} to {h} and updating answer to {answer}')
+        print(f"adding {numbers[idx]} to {h} and updating answer to {answer}")
 
     # If we don't have numbers left, and we have entries in h, just pop
     elif h:
-        answer.append(heapq.heappop(h))    
-        print(f'updating answer to {answer}')
+        answer.append(heapq.heappop(h))
+        print(f"updating answer to {answer}")
 
 print(answer)

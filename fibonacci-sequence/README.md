@@ -6,12 +6,12 @@ I think this would best be done recursively! As a reminder, Fibonacci's Sequence
 0 1 1 2 3 5 8 13...
 ```
 
+*The below is from a few years ago... see [run.py](py)*
+
 Let's write a function to return the sequence for N characters.
 
 
 ```python
-
-
 def fibonacci(N):
     first = 0
     second = 1
@@ -35,8 +35,6 @@ Now let's write a function to return the number of the Nth character.
 
 
 ```python
-
-
 def fibonacci(N):
 
     # Base cases
@@ -45,6 +43,4 @@ def fibonacci(N):
 
     # Otherwise, return previous two fibonacci numbers
     return fibonacci(N-1) + fibonacci(N-2)
-
-
 ```

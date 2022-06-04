@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-'''
+"""
   1. First Come First Out
   Here we do everything in serial, no async!
   Note that we are just *calculating* the times and not just enduring them
@@ -27,12 +27,10 @@
       avg turnaround: 16.0
          avg waiting: 8.333333333333334
 
-'''
+"""
 
-from bases import ( 
-    Process, 
-    FCFOQueue 
-)
+from bases import Process, FCFOQueue
+
 
 def main():
 
@@ -44,25 +42,25 @@ def main():
     queue = FCFOQueue(pids, burst_times)
 
     # Burst time is time takes CPU to get running
-    print('     Burst times: %s' %' | '.join(str(x) for x in burst_times))
+    print("     Burst times: %s" % " | ".join(str(x) for x in burst_times))
 
     # 2 - Find waiting time (wt) for all processes.
     wts = queue.calculate_waiting_times()
     # [0, 10, 15]
-    print('   Waiting times: %s' %' | '.join(str(x) for x in wts))
+    print("   Waiting times: %s" % " | ".join(str(x) for x in wts))
 
-    # 5-  Find turnaround time = waiting_time + burst_time 
+    # 5-  Find turnaround time = waiting_time + burst_time
     #    for all processes.
     trt = queue.calculate_turnaround_times()
     # [0, 15, 23]
-    print('Turnaround times: %s' %' | '.join(str(x) for x in trt))
+    print("Turnaround times: %s" % " | ".join(str(x) for x in trt))
 
     # Find average waiting time
     average_waiting = sum(wts) / len(queue.processes)
-    average_turnaround = sum(trt) / len(queue.processes)    
-    print('  avg turnaround: %s' %average_turnaround)
-    print('     avg waiting: %s' %average_waiting)
+    average_turnaround = sum(trt) / len(queue.processes)
+    print("  avg turnaround: %s" % average_turnaround)
+    print("     avg waiting: %s" % average_waiting)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

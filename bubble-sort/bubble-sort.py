@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-numbers = [1,2,3,4,5,8,3,2,3,1,1,1]
+numbers = [1, 2, 3, 4, 5, 8, 3, 2, 3, 1, 1, 1]
 
 
 def bubblesort(numbers):
@@ -24,11 +24,12 @@ def bubblesort(numbers):
                 numbers[indexA] = numbers[indexB]
                 numbers[indexB] = holder
                 switched = True
-        
-            indexA+=1
-            indexB+=1
 
-    print('Sorted numbers are %s' % numbers)
+            indexA += 1
+            indexB += 1
+
+    print("Sorted numbers are %s" % numbers)
     return numbers
+
 
 bubblesort(numbers)

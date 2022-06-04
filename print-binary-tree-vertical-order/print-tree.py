@@ -1,16 +1,16 @@
-
-
 # https://www.geeksforgeeks.org/print-binary-tree-vertical-order-set-2/
 
 # First create a node, should hold left and right
 
-class Node:
 
+class Node:
     def __init__(self, value):
         self.left = None
         self.right = None
         self.value = value
-'''
+
+
+"""
            1
         /    \ 
        2      3
@@ -18,7 +18,7 @@ class Node:
      4   5  6   7
                /  \ 
               8   9               
-'''
+"""
 
 # Create a tiny tree to test
 
@@ -36,12 +36,13 @@ root.right.right.rigt = Node(9)
 # The general idea is to store a dictionary of distances, and each has
 # a list of nodes of that distance
 
+
 def getVerticalOrder(root, horizontal_distance, lookup):
 
-    # If no tree, no result  
-    if root is None: 
+    # If no tree, no result
+    if root is None:
         return
-      
+
     # Whatever node we are at, add its distance
     try:
         lookup[horizontal_distance].append(root.value)
@@ -49,28 +50,29 @@ def getVerticalOrder(root, horizontal_distance, lookup):
         lookup[horizontal_distance] = [root.value]
 
     # Store nodes in left and right
-    getVerticalOrder(root.left, horizontal_distance-1, lookup) 
-    getVerticalOrder(root.right, horizontal_distance+1, lookup) 
-  
+    getVerticalOrder(root.left, horizontal_distance - 1, lookup)
+    getVerticalOrder(root.right, horizontal_distance + 1, lookup)
 
-def printVerticalOrder(root): 
-      
+
+def printVerticalOrder(root):
+
     lookup = dict()
     horizontal_distance = 0
-    getVerticalOrder(root, horizontal_distance, lookup) 
-      
-    # Traverse the map and print nodes at every horizontal 
-    # distance (hd) 
-    for index, value in enumerate(sorted(lookup)): 
+    getVerticalOrder(root, horizontal_distance, lookup)
+
+    # Traverse the map and print nodes at every horizontal
+    # distance (hd)
+    for index, value in enumerate(sorted(lookup)):
         output = [str(x) for x in lookup[value]]
         print(" ".join(output))
 
+
 printVerticalOrder(root)
 
-'''
+"""
 4
 2
 1 5 6
 3 8
 7
-'''
+"""

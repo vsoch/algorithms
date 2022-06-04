@@ -1,4 +1,3 @@
-
 # Compare two strings represented as linked lists
 # Given two linked lists, represented as linked lists (every character is a node in linked list). Write a function compare() that works similar to strcmp(), i.e., it returns 0 if both strings are same, 1 if first linked list is lexicographically greater, and -1 if second string is lexicographically greater.
 
@@ -17,12 +16,13 @@
 # Output: 0
 
 
-class Node: 
-  
-    # Constructor to create a new node 
-    def __init__(self, char): 
+class Node:
+
+    # Constructor to create a new node
+    def __init__(self, char):
         self.c = char
         self.next = None
+
 
 def compare(str1, str2):
 
@@ -36,7 +36,7 @@ def compare(str1, str2):
         str2 = str2.next
 
     # When we get here, if both are still defined
-    if (str1 and str2):
+    if str1 and str2:
         if str1.c > str2.c:
             return 1
         return -1
@@ -50,20 +50,21 @@ def compare(str1, str2):
 
     return 0
 
-# Driver program 
-  
-list1 = Node('g') 
-list1.next = Node('e') 
-list1.next.next = Node('e') 
-list1.next.next.next = Node('k') 
-list1.next.next.next.next = Node('s') 
-list1.next.next.next.next.next = Node('b') 
-  
-list2 = Node('g') 
-list2.next = Node('e') 
-list2.next.next = Node('e') 
-list2.next.next.next = Node('k') 
-list2.next.next.next.next = Node('s') 
-list2.next.next.next.next.next = Node('a') 
-  
+
+# Driver program
+
+list1 = Node("g")
+list1.next = Node("e")
+list1.next.next = Node("e")
+list1.next.next.next = Node("k")
+list1.next.next.next.next = Node("s")
+list1.next.next.next.next.next = Node("b")
+
+list2 = Node("g")
+list2.next = Node("e")
+list2.next.next = Node("e")
+list2.next.next.next = Node("k")
+list2.next.next.next.next = Node("s")
+list2.next.next.next.next.next = Node("a")
+
 print(compare(list1, list2))

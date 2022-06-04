@@ -1,6 +1,7 @@
 ################################################################################
-# 1. Design an algorithm to print all permutations of a string. 
+# 1. Design an algorithm to print all permutations of a string.
 # For simplicity, assume all characters are unique.
+
 
 def get_perms(letters):
 
@@ -18,22 +19,23 @@ def get_perms(letters):
     for i in range(len(letters)):
         letter = letters[i]
         start = letters[:i]
-        remaining = start + letters[i+1:]
+        remaining = start + letters[i + 1 :]
         for perm in get_perms(remaining):
             current.append(letter + perm)
 
     return current
- 
+
 
 # This is how I'd actually do it, lol :)
 from itertools import permutations
-l = list(permutations('hello'))
+
+l = list(permutations("hello"))
 print l
 
 
 ################################################################################
-# 2. Given a smaller string S and a bigger string b, design an algorithm 
-# to find all permutations of the shorter string within the longer one. 
+# 2. Given a smaller string S and a bigger string b, design an algorithm
+# to find all permutations of the shorter string within the longer one.
 # Print the location of each permutation.
 
 import sys
@@ -47,8 +49,8 @@ unique_big = set(big)
 
 # If there are not enough overlaps to have a permutation, we don't have any
 if len(unique_small.intersection(unique_big)) < len(unique_small):
-   print('No permutations of %s are possible to have in %s' %(big, small))
-   sys.exit(0)
+    print ("No permutations of %s are possible to have in %s" % (big, small))
+    sys.exit(0)
 
 
 # Keep a list of found permutations
@@ -56,31 +58,32 @@ found = []
 idxes = []
 
 # Iterate through the length of the smaller string
-perm = ''
+perm = ""
 for idx in range(len(big)):
     b = big[idx]
-    next = idx+1
+    next = idx + 1
     while b in small and next < len(big):
 
         # Stopping case, we found a permutation
         if len(perm) == len(small):
             found.append(perm)
             idxes.append(idx)
-            perm = ''
-        
+            perm = ""
+
         # if different lengths, still looking
         if big[next] in small:
-            print('%s in %s' %(big[next], small))
+            print ("%s in %s" % (big[next], small))
             perm += big[next]
 
         # Update character (b) and next index (next)
         b = big[next]
-        next = next+1
+        next = next + 1
 
 
 ## Sorting
 
-A = 'AAACCDEGEFDGBBBAAACCCDDD'
+A = "AAACCDEGEFDGBBBAAACCCDDD"
+
 
 def insertion_sort(A):
 
@@ -88,10 +91,10 @@ def insertion_sort(A):
         A = list(A)
 
     # Grab first set of two in pair
-    for a in range(len(A)-1):
+    for a in range(len(A) - 1):
 
         # Grab second in pair
-        for b in range(a+1, len(A)):
+        for b in range(a + 1, len(A)):
 
             # If the second is less than the first, swap
             if A[b] < A[a]:
@@ -100,22 +103,20 @@ def insertion_sort(A):
     return A
 
 
-
 # Given two (singly) linked lists, determine if the two lists intersect. Return the inter-
 # secting node. Note that the intersection is defined based on reference, not value. That is, if the kth
 # node of the first linked list is the exact same node (by reference) as the jth node of the second
 # linked list, then they are intersecting
 
+
 class Node(object):
- 
     def __init__(self, value, left=None, right=None):
         self.value = value
         self.left = left
         self.right = right
 
-    
-class LinkedList(object):
 
+class LinkedList(object):
     def __init__(self):
         self.start_node
 
@@ -136,7 +137,7 @@ class LinkedList(object):
 
             # Create a new node
             node = Node(value, left=contender)
-            print('Added node %s' %node)
-
+            print ("Added node %s" % node)
 
     def remove_by_value():
+        pass

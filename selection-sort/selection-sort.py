@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 
-numbers = [1,2,3,4,6,8,4,3,2,2,6,2,3]
+numbers = [1, 2, 3, 4, 6, 8, 4, 3, 2, 2, 6, 2, 3]
+
 
 def selectionsort(numbers):
 
@@ -16,12 +17,12 @@ def selectionsort(numbers):
 
         # Keep an index to the smallest
         smallest = 0
-    
+
         # Start with index at 0, and move smallest element to the end
         for idx in range(0, len(numbers)):
             if numbers[idx] < numbers[smallest]:
                 smallest = idx
-                print('Smallest is %s' % numbers[smallest])
+                print("Smallest is %s" % numbers[smallest])
 
         # Add the smallest to the end of the sorted list
         sortedN.append(numbers.pop(smallest))

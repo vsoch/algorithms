@@ -1,5 +1,5 @@
-
 # Problem: Given a string, find the longest palindrome substring
+
 
 def is_palidrome(string):
     """A helper function to go from ends to middle to check if palindrome.
@@ -10,8 +10,8 @@ def is_palidrome(string):
     while start <= end:
         if string[start] != string[end]:
             return False
-        start+=1
-        end-=1
+        start += 1
+        end -= 1
     return True
 
 
@@ -27,7 +27,7 @@ def longest_palidrome_brute_force(string):
 
     for i in range(len(string)):
         for j in range(len(string)):
-            substring = string[i:j+1]
+            substring = string[i : j + 1]
             if is_palidrome(substring):
                 if len(substring) > longest:
                     winner = substring
@@ -51,18 +51,18 @@ def longest_palindrome_substructure(string):
         lookup[i] = []
 
     # Length 1
-    for i in range(len(string)-1):
-        lookup[1].append((i, i+1))
+    for i in range(len(string) - 1):
+        lookup[1].append((i, i + 1))
 
     # Length 2
-    for i in range(len(string)-2):
-        if string[i] == string[i+2]:
-            lookup[2].append((i, i+2))
+    for i in range(len(string) - 2):
+        if string[i] == string[i + 2]:
+            lookup[2].append((i, i + 2))
 
     # Now length 3 through N
     for length in range(3, len(string) + 1):
         # Look at lengths that are two sizes smaller (and check edges)
-        coords = lookup[length-2]
+        coords = lookup[length - 2]
         # For each set of coords, check the outer characters
         for coord in coords:
             i = coord[0] - 1
@@ -71,11 +71,11 @@ def longest_palindrome_substructure(string):
             # Must be in bounds to check
             if i >= 0 and j < len(string):
                 if string[i] == string[j]:
-                    lookup[length].append((i,j))
+                    lookup[length].append((i, j))
 
     # Find the longest (could be more than one)
-    for i in range(len(string) -1, 0, -1):
+    for i in range(len(string) - 1, 0, -1):
         if len(lookup[i]) > 0:
             print("Found longest palidrome for length %s" % i)
-            [print("%s\n" % string[e[0]:e[1]+1]) for e in lookup[i]]
+            [print("%s\n" % string[e[0] : e[1] + 1]) for e in lookup[i]]
             break

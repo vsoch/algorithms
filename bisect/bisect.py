@@ -1,4 +1,3 @@
-
 def left_bisect(sorted_list, element):
     """Find an element in a list (from left side)
     """
@@ -15,7 +14,8 @@ def left_bisect(sorted_list, element):
         elif middle >= element:
             idxRight = idxMiddle
     return idxLeft
-    
+
+
 def right_bisect(sorted_list, element):
     """
     Find an element in a list (from the right)
